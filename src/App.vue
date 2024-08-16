@@ -100,6 +100,9 @@
 
 
           <button type="submit" class="p-2 mt-4 text-white bg-green-500 rounded">Submit</button>
+
+          <button @click="printCV" class="p-2 mt-4 text-white bg-green-500 rounded">Print CV</button>
+
         </Form>
       </div>
 
@@ -117,7 +120,7 @@
 </template>
 
 
-<script setup>
+<!-- <script setup>
 import { ref } from 'vue';
 import { Form } from 'vee-validate';
 import * as yup from 'yup';
@@ -193,7 +196,173 @@ const removeItem = (section, index) => {
 const submitForm = () => {
   console.log('Form submitted', user.value);
 };
+
+const printCV = () => {
+  // Check if the form is valid before printing
+  Form.validate().then(() => {
+    // Create a print-friendly version of the CV
+    const printWindow = window.open('', '', 'height=800,width=600');
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+      <head>
+        <title>Print CV</title>
+        <style>
+          @media print {
+            #cv-preview {
+              width: 210mm; /* A4 width */
+              height: auto;
+            }
+          }
+          #cv-preview {
+            aspect-ratio: 210 / 297;
+            max-width: 210mm;
+            /* Set the max width to A4 width */
+            height: auto;
+          }
+        </style>
+      </head>
+      <body onload="window.print();window.close();">
+        <div id="cv-preview">
+          ${document.querySelector('#cv-preview').innerHTML}
+        </div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }).catch((errors) => {
+    console.error('Validation failed:', errors);
+  });
+};
+
+</script> -->
+
+<script setup>
+import { ref } from 'vue';
+import { useForm } from 'vee-validate';
+import * as yup from 'yup';
+import FloatingLabelField from './components/FloatingLabelField.vue';
+import DefaultButton from './components/DefaultButton.vue';
+import CVPreview from './components/CVPreview.vue';
+import ImageUpload from './components/ImageUpload.vue';
+import DeleteButton from './components/DeleteButton.vue';
+import PageHeader from './components/PageHeader.vue';
+import PageFooter from './components/PageFooter.vue';
+
+// User data structure
+const user = ref({
+  name: 'Yousif Mahmood',
+  email: 'yousifvnd@gmail.com',
+  phone: '07732083333',
+  experiences: [{ role: 'Web Developer', company: 'Mars Team' }],
+  educations: [{ degree: 'Computer Engineering', institution: 'University of Baghdad' }],
+  projects: [{ title: 'CV Generator', description: 'Free web app with a simple & straightforward interface to help you craft the best CV for your next interview' }],
+  certificates: [{ title: 'CS50x', issuer: 'Harvard University' }],
+  skills: ['Vue.js', 'Tailwind CSS', 'Laravel', 'MySQL', 'Git'],
+  photo: './img/cv-placeholder.jpeg',
+});
+
+const updatePhoto = (newPhoto) => {
+  user.value.photo = newPhoto;
+};
+
+// Form schema
+const formSchema = yup.object({
+  name: yup.string().required('Name is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  phone: yup.string().required('Phone is required'),
+  experiences: yup.array().of(
+    yup.object({
+      role: yup.string().required('Role is required'),
+      company: yup.string().required('Company is required'),
+    })
+  ).min(1, 'At least one experience is required'),
+  educations: yup.array().of(
+    yup.object({
+      degree: yup.string().required('Degree is required'),
+      institution: yup.string().required('Institution is required'),
+    })
+  ).min(1, 'At least one education is required'),
+  projects: yup.array().of(
+    yup.object({
+      title: yup.string().required('Title is required'),
+      description: yup.string().required('Description is required'),
+    })
+  ).min(1, 'At least one project is required'),
+  certificates: yup.array().of(
+    yup.object({
+      title: yup.string().required('Title is required'),
+      issuer: yup.string().required('Issuer is required'),
+    })
+  ).min(1, 'At least one certificate is required'),
+  skills: yup.array().of(
+    yup.string().required('Skill is required')
+  ).min(1, 'At least one skill is required'),
+});
+
+// Generic handlers for adding/removing sections
+const addItem = (section, defaultItem) => {
+  user.value[section].push(defaultItem);
+};
+
+const removeItem = (section, index) => {
+  user.value[section].splice(index, 1);
+};
+
+// Set up form validation
+const { validate, resetForm } = useForm({
+  validationSchema: formSchema,
+});
+
+// Submit form
+const submitForm = async () => {
+  try {
+    await validate();
+    console.log('Form submitted', user.value);
+  } catch (errors) {
+    console.error('Validation failed:', errors);
+  }
+};
+
+// Print CV
+const printCV = async () => {
+  try {
+    await validate(); // Validate the form
+    const printWindow = window.open('', '', 'height=800,width=600');
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+      <head>
+        <title>CV Generator</title>
+        <style>
+          @media print {
+            #cv-preview {
+              width: 210mm; /* A4 width */
+              height: auto;
+            }
+          }
+          #cv-preview {
+            aspect-ratio: 210 / 297;
+            max-width: 210mm;
+            /* Set the max width to A4 width */
+            height: auto;
+          }
+        </style>
+      </head>
+      <body onload="window.print();window.close();">
+        <div id="cv-preview">
+          ${document.querySelector('#cv-preview').innerHTML}
+        </div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  } catch (errors) {
+    console.error('Validation failed:', errors);
+  }
+};
 </script>
+
 
 <style scoped>
 #cv-preview {
