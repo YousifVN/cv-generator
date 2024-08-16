@@ -16,7 +16,7 @@
             <input id="dropzone-file" type="file" class="hidden" @change="onPhotoUpload" accept="image/*" />
         </label>
 
-        <DeleteButton text="Remove Photo" v-if="photo" @click="removePhoto" class="mt-8"/>
+        <DeleteButton text="Remove Photo" v-if="photo" @click="removePhoto" class="mt-8" />
     </div>
 
     <hr class="mt-10 mb-5 text-gray-100">

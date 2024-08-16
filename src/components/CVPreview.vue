@@ -70,23 +70,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Awards -->
-        <!-- <section v-if="user.awards.length">
-        <h2 class="mt-4 text-xl font-semibold">Awards</h2>
-        <div v-for="(award, index) in user.awards" :key="index">
-          <p>{{ award.title }} ({{ award.year }})</p>
-        </div>
-      </section> -->
-
-        <!-- Volunteering -->
-        <!-- <section v-if="user.volunteering.length">
-        <h2 class="mt-4 text-xl font-semibold">Volunteering</h2>
-        <div v-for="(volunteer, index) in user.volunteering" :key="index">
-          <p>{{ volunteer.role }} at {{ volunteer.organization }}</p>
-        </div>
-      </section> -->
-
     </div>
 </template>
 
