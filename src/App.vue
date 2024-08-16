@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-100 p-10 flex flex-col lg:flex-row lg:space-x-4">
+  <div class="flex flex-col min-h-screen p-10 bg-black lg:flex-row lg:space-x-4">
     <!-- Form Section -->
-    <div class="w-full lg:w-1/4 p-4 bg-white shadow-md rounded-lg mb-4 lg:mb-0 h-screen overflow-y-auto">
+    <div class="w-full max-h-[100vh] p-4 mb-4 overflow-y-scroll bg-gray-700 rounded-lg shadow-md lg:w-1/4 lg:mb-0">
       <PersonalInfoForm />
       <ExperienceForm />
       <EducationForm />
@@ -10,23 +10,14 @@
       <AwardsForm />
       <VolunteeringForm />
       <ProjectsForm />
-      <button @click="generatePDF" class="bg-green-500 text-white p-2 rounded mt-4">Download as PDF</button>
+      <button @click="generatePDF" class="p-2 mt-4 text-white bg-green-500 rounded">Download as PDF</button>
     </div>
 
     <!-- CV Preview Section -->
-    <div class="w-full lg:w-3/4 p-4 bg-white shadow-md rounded-lg flex flex-col justify-center items-center">
-      <!-- Preview Control Buttons -->
-      <div class="flex space-x-4 mb-4">
-        <button @click="decreaseSize" class="bg-blue-500 text-white p-2 rounded">-</button>
-        <input v-model="customSize" type="range" min="30" max="100" class="slider" @input="updatePreviewSize" />
-        <button @click="increaseSize" class="bg-blue-500 text-white p-2 rounded">+</button>
-        <span>{{ customSize }}%</span>
-        <button @click="fitToScreen" class="bg-blue-500 text-white p-2 rounded">Fit</button>
-      </div>
-
+    <div
+      class="flex flex-col items-center justify-center w-full p-4 overflow-hidden bg-gray-700 rounded-lg shadow-md lg:w-3/4 max-h-[100vh]">
       <!-- CV Preview Section -->
-      <div id="cv-preview" class="bg-white shadow-lg overflow-hidden border"
-        :style="{ width: customSize + '%', aspectRatio: '210 / 297' }">
+      <div id="cv-preview" class="overflow-hidden bg-gray-500 border shadow-lg" :style="cvStyles">
         <CVPreview :user="user" />
       </div>
     </div>
@@ -34,7 +25,11 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted } from 'vue';
+import { ref, provide } from 'vue';
+
+import * as yup from 'yup';
+import { Field, Form, ErrorMessage } from 'vee-validate';
+
 import html2pdf from 'html2pdf.js/dist/html2pdf.bundle.min';
 import PersonalInfoForm from './components/PersonalInfoForm.vue';
 import ExperienceForm from './components/ExperienceForm.vue';
@@ -54,13 +49,10 @@ const user = ref({
   educations: [{ degree: 'computer engineering', institution: 'uob' }],
   skills: ['reading', 'writing'],
   certificates: [{ title: 'cs50x', issuer: 'harvard university' }],
-  awards: [{ title: '', year: '' }],
-  volunteering: [{ role: '', organization: '' }],
-  projects: [{ title: '', description: '' }],
+  awards: [{ title: 'good student', year: '2015' }],
+  volunteering: [{ role: 'kite crafting', organization: 'baghdad kites carnival' }],
+  projects: [{ title: 'weather app', description: 'dynamic weather app to show real time weather forecasts around the world' }],
 });
-
-const customSize = ref(100); // Default size for preview
-const originalSize = ref(100); // Track the user's preferred preview size
 
 const generatePDF = () => {
   const element = document.getElementById('cv-preview');
@@ -75,43 +67,21 @@ const generatePDF = () => {
   });
 };
 
-const updatePreviewSize = () => {
-  // Keep track of the user's chosen size
-  originalSize.value = customSize.value;
-};
-
-const increaseSize = () => {
-  if (customSize.value < 100) {
-    customSize.value += 10;
-    originalSize.value = customSize.value;
-  }
-};
-
-const decreaseSize = () => {
-  if (customSize.value > 30) {
-    customSize.value -= 10;
-    originalSize.value = customSize.value;
-  }
-};
-
-// "Fit" function to adjust preview to fit the screen size
-const fitToScreen = () => {
-  customSize.value = 100; // Adjust this percentage to fit as needed
-  originalSize.value = customSize.value;
-};
-
 provide('user', user);
 </script>
 
-<style>
-/* Custom Style to Lock A4 Ratio */
+<style scoped>
 #cv-preview {
   aspect-ratio: 210 / 297;
+  max-width: 210mm;
+  /* Set the max width to A4 width */
   height: auto;
 }
 
-/* Style for the slider */
-.slider {
-  width: 100px;
+@media screen and (max-width: 640px) {
+  #cv-preview {
+    width: 100%;
+    padding: 1rem;
+  }
 }
 </style>

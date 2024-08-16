@@ -9,8 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vee-validate/yup": "^4.13.2",
     "html2pdf.js": "^0.10.2",
-    "vue": "^3.4.35"
+    "vee-validate": "^4.13.2",
+    "vue": "^3.4.35",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.2",
