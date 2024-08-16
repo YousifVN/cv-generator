@@ -1,19 +1,37 @@
 <template>
     <section>
-        <h2 class="text-2xl font-semibold mb-4">Certificates</h2>
+        <h2 class="mb-4 text-2xl font-semibold text-white">Certificates</h2>
+
         <div v-for="(certificate, index) in user.certificates" :key="index" class="mb-4">
-            <input v-model="certificate.title" placeholder="Certificate Title" class="border w-full p-2 mb-2" />
-            <input v-model="certificate.issuer" placeholder="Issuer" class="border w-full p-2 mb-2" />
-            <button @click="removeCertificate(index)" class="text-red-500">Remove</button>
+            <Form :validation-schema="getSchema(index)">
+                <FloatingLabelField v-model="certificate.title" :name="'title' + index" label="Title" />
+                <FloatingLabelField v-model="certificate.issuer" :name="'issuer' + index" label="Issuer" />
+                <DeleteButton text="Remove Certificate" @click="removeCertificate(index)" />
+            </Form>
         </div>
-        <button @click="addCertificate" class="bg-blue-500 text-white p-2 rounded">Add Certificate</button>
+
+        <DefaultButton text="Add certificate" @click="addCertificate" />
     </section>
+
+    <hr class="mt-10 mb-5 text-gray-100">
 </template>
 
 <script setup>
+import { Form } from 'vee-validate';
+import * as yup from 'yup';
+import FloatingLabelField from './FloatingLabelField.vue';
+import DefaultButton from './DefaultButton.vue';
+import DeleteButton from './DeleteButton.vue';
 import { inject } from 'vue';
 
 const user = inject('user');
+
+const getSchema = (index) => {
+    return yup.object({
+        ['title' + index]: yup.string().required('Title is required'),
+        ['issuer' + index]: yup.string().required('Issuer is required'),
+    });
+};
 
 const addCertificate = () => {
     user.value.certificates.push({ title: '', issuer: '' });

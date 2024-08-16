@@ -1,11 +1,14 @@
 <template>
-
   <div class="font-hanken-grotesk">
     <PageHeader />
     <div class="flex flex-col min-h-screen mt-0 mb-10 ml-10 mr-10 bg-black lg:flex-row lg:space-x-4">
       <!-- Form Section -->
       <div class="w-full max-h-[100vh] p-4 mb-4 overflow-y-scroll bg-gray-700 rounded-lg shadow-md lg:w-1/4 lg:mb-0">
         <PersonalInfoForm />
+
+        <!-- Image Upload Component -->
+        <ImageUpload :photo="user.photo" @update:photo="updatePhoto" />
+
         <ExperienceForm />
         <EducationForm />
         <ProjectsForm />
@@ -42,19 +45,23 @@ import ProjectsForm from './components/ProjectsForm.vue';
 import CVPreview from './components/CVPreview.vue';
 import PageHeader from './components/PageHeader.vue';
 import PageFooter from './components/PageFooter.vue';
+import ImageUpload from './components/ImageUpload.vue';
 
 const user = ref({
-  name: 'yousif',
-  email: 'you@gmail.com',
-  phone: '08873238238',
-  experiences: [{ role: 'web dev', company: 'mars team' }],
-  educations: [{ degree: 'computer engineering', institution: 'uob' }],
-  skills: ['reading', 'writing'],
-  certificates: [{ title: 'cs50x', issuer: 'harvard university' }],
-  // awards: [{ title: 'good student', year: '2015' }],
-  // volunteering: [{ role: 'kite crafting', organization: 'baghdad kites carnival' }],
-  projects: [{ title: 'weather app', description: 'dynamic weather app to show real time weather forecasts around the world' }],
+  name: 'Yousif Mahmood',
+  email: 'yousifvnd@gmail.com',
+  phone: '07732083333',
+  experiences: [{ role: 'Wev Developer', company: 'Mars Team' }],
+  educations: [{ degree: 'Computer Engineering', institution: 'University of Baghdad' }],
+  skills: ['Vue.js', 'Tailwind CSS', 'Laravel'],
+  certificates: [{ title: 'CS50x', issuer: 'Harvard University' }],
+  projects: [{ title: 'Weather App', description: 'Dynamic weather app to show real time weather forecasts around the world' }],
+  photo: './img/cv-placeholder.jpeg',
 });
+
+const updatePhoto = (newPhoto) => {
+  user.value.photo = newPhoto;
+};
 
 const generatePDF = () => {
   const element = document.getElementById('cv-preview');
@@ -79,11 +86,4 @@ provide('user', user);
   /* Set the max width to A4 width */
   height: auto;
 }
-
-/* @media screen and (max-width: 640px) {
-  #cv-preview {
-    width: 100%;
-    padding: 1rem;
-  }
-} */
 </style>

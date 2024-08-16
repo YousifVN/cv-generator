@@ -5,6 +5,8 @@ export default {
     extend: {
       fontFamily: {
         "hanken-grotesk": ["Hanken Grotesk", "sans-serif"],
+        "playfair-display": ["Playfair Display", "sans-serif"],
+        "sedan": ["Sedan", "sans-serif"],
       },
     },
   },
