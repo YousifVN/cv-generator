@@ -1,5 +1,5 @@
 <template>
-    <div id="cv-preview">
+    <div id="cv-preview" class="p-5">
         <h1 class="text-2xl font-semibold">{{ user.name }}</h1>
         <p>Email: {{ user.email }}</p>
         <p>Phone: {{ user.phone }}</p>
@@ -32,19 +32,19 @@
             </div>
         </section>
         <!-- Awards -->
-        <section v-if="user.awards.length">
+        <!-- <section v-if="user.awards.length">
             <h2 class="mt-4 text-xl font-semibold">Awards</h2>
             <div v-for="(award, index) in user.awards" :key="index">
                 <p>{{ award.title }} ({{ award.year }})</p>
             </div>
-        </section>
+        </section> -->
         <!-- Volunteering -->
-        <section v-if="user.volunteering.length">
+        <!-- <section v-if="user.volunteering.length">
             <h2 class="mt-4 text-xl font-semibold">Volunteering</h2>
             <div v-for="(volunteer, index) in user.volunteering" :key="index">
                 <p>{{ volunteer.role }} at {{ volunteer.organization }}</p>
             </div>
-        </section>
+        </section> -->
         <!-- Projects -->
         <section v-if="user.projects.length">
             <h2 class="mt-4 text-xl font-semibold">Projects</h2>
@@ -62,9 +62,3 @@ defineProps({
 });
 </script>
 
-<style scoped>
-#cv-preview {
-    padding: 2rem;
-    /* Padding for better presentation */
-}
-</style>
