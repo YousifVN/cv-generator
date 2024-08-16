@@ -1,24 +1,108 @@
 <template>
   <div class="font-hanken-grotesk">
+
     <PageHeader />
+
     <div class="flex flex-col min-h-screen mt-0 mb-10 ml-10 mr-10 bg-black lg:flex-row lg:space-x-4">
+
       <!-- Form Section -->
       <div class="w-full max-h-[100vh] p-4 mb-4 overflow-y-scroll bg-gray-700 rounded-lg shadow-md lg:w-1/4 lg:mb-0">
-        <PersonalInfoForm />
+        <Form @submit="submitForm" :validation-schema="formSchema">
 
-        <!-- Image Upload Component -->
-        <ImageUpload :photo="user.photo" @update:photo="updatePhoto" />
+          <!-- Personal Info Fields -->
+          <section>
+            <h2 class="mb-4 text-2xl font-semibold text-white">Personal Information</h2>
+            <FloatingLabelField v-model="user.name" name="name" label="Name" />
+            <FloatingLabelField v-model="user.email" name="email" label="Email" />
+            <FloatingLabelField v-model="user.phone" name="phone" label="Phone" />
 
-        <ExperienceForm />
-        <EducationForm />
-        <ProjectsForm />
-        <SkillsForm />
-        <CertificatesForm />
-        <!-- <AwardsForm /> -->
-        <!-- <VolunteeringForm /> -->
-        <button @click="generatePDF" class="p-2 mt-4 text-white bg-green-500 rounded">Download as PDF</button>
+            <hr class="mt-10 mb-5 text-gray-100">
+          </section>
+
+          <!-- Image Upload Component -->
+          <section>
+            <ImageUpload :photo="user.photo" @update:photo="updatePhoto" />
+          </section>
+
+          <!-- Experience Fields -->
+          <section>
+            <h2 class="mb-4 text-2xl font-semibold text-white">Work Experience</h2>
+            <div v-for="(experience, index) in user.experiences" :key="index" class="mb-4">
+              <FloatingLabelField v-model="experience.role" :name="'experiences[' + index + '].role'" as="input"
+                :rules="'required'" label="Role" />
+              <FloatingLabelField v-model="experience.company" :name="'experiences[' + index + '].company'" as="input"
+                :rules="'required'" label="Company" />
+              <DeleteButton text="Remove Experience" @click="removeItem('experiences', index)" />
+            </div>
+            <DefaultButton text="Add Experience" @click="addItem('experiences', { role: '', company: '' })" />
+
+            <hr class="mt-10 mb-5 text-gray-100">
+          </section>
+
+          <!-- Education Fields -->
+          <section>
+            <h2 class="mb-4 text-2xl font-semibold text-white">Education</h2>
+            <div v-for="(education, index) in user.educations" :key="index" class="mb-4">
+              <FloatingLabelField v-model="education.degree" :name="'educations[' + index + '].degree'" as="input"
+                :rules="'required'" label="Degree" />
+              <FloatingLabelField v-model="education.institution" :name="'educations[' + index + '].institution'"
+                as="input" :rules="'required'" label="Institution" />
+              <DeleteButton text="Remove Education" @click="removeItem('educations', index)" />
+            </div>
+            <DefaultButton text="Add Education" @click="addItem('educations', { degree: '', institution: '' })" />
+
+            <hr class="mt-10 mb-5 text-gray-100">
+          </section>
+
+          <!-- Projects Fields -->
+          <section>
+            <h2 class="mb-4 text-2xl font-semibold text-white">Projects</h2>
+            <div v-for="(project, index) in user.projects" :key="index" class="mb-4">
+              <FloatingLabelField v-model="project.title" :name="'projects[' + index + '].title'" as="input"
+                :rules="'required'" label="Title" />
+              <FloatingLabelField v-model="project.description" :name="'projects[' + index + '].description'" as="input"
+                :rules="'required'" label="Description" />
+              <DeleteButton text="Remove Project" @click="removeItem('projects', index)" />
+            </div>
+            <DefaultButton text="Add Project" @click="addItem('projects', { title: '', description: '' })" />
+
+            <hr class="mt-10 mb-5 text-gray-100">
+          </section>
+
+          <!-- Certificates Fields -->
+          <section>
+            <h2 class="mb-4 text-2xl font-semibold text-white">Certificates</h2>
+            <div v-for="(certificate, index) in user.certificates" :key="index" class="mb-4">
+              <FloatingLabelField v-model="certificate.title" :name="'certificates[' + index + '].title'" as="input"
+                :rules="'required'" label="Title" />
+              <FloatingLabelField v-model="certificate.issuer" :name="'certificates[' + index + '].issuer'" as="input"
+                :rules="'required'" label="Issuer" />
+              <DeleteButton text="Remove Certificate" @click="removeItem('certificates', index)" />
+            </div>
+            <DefaultButton text="Add Certificate" @click="addItem('certificates', { title: '', issuer: '' })" />
+
+            <hr class="mt-10 mb-5 text-gray-100">
+          </section>
+
+          <!-- Skills Fields -->
+          <section>
+            <h2 class="mb-4 text-2xl font-semibold text-white">Skills</h2>
+            <div v-for="(skill, index) in user.skills" :key="index" class="mb-4">
+              <FloatingLabelField v-model="user.skills[index]" :name="'skills.' + index" :rules="'required'"
+                label="Skill" />
+              <DeleteButton text="Remove Skill" @click="removeItem('skills', index)" />
+            </div>
+            <DefaultButton text="Add Skill" @click="addItem('skills', '')" />
+
+            <hr class="mt-10 mb-5 text-gray-100">
+          </section>
+
+
+
+          <button type="submit" class="p-2 mt-4 text-white bg-green-500 rounded">Submit</button>
+        </Form>
       </div>
-      <!-- CV Preview Section -->
+
       <div
         class="flex flex-col items-center justify-center w-full p-4 overflow-hidden bg-gray-700 rounded-lg shadow-md lg:w-3/4 max-h-[100vh]">
         <!-- CV Preview Section -->
@@ -27,35 +111,34 @@
         </div>
       </div>
     </div>
+
     <PageFooter />
   </div>
 </template>
 
+
 <script setup>
-import { ref, provide } from 'vue';
-import html2pdf from 'html2pdf.js/dist/html2pdf.bundle.min';
-import PersonalInfoForm from './components/PersonalInfoForm.vue';
-import ExperienceForm from './components/ExperienceForm.vue';
-import EducationForm from './components/EducationForm.vue';
-import SkillsForm from './components/SkillsForm.vue';
-import CertificatesForm from './components/CertificatesForm.vue';
-// import AwardsForm from './components/AwardsForm.vue';
-// import VolunteeringForm from './components/VolunteeringForm.vue';
-import ProjectsForm from './components/ProjectsForm.vue';
+import { ref } from 'vue';
+import { Form } from 'vee-validate';
+import * as yup from 'yup';
+import FloatingLabelField from './components/FloatingLabelField.vue';
+import DefaultButton from './components/DefaultButton.vue';
 import CVPreview from './components/CVPreview.vue';
+import ImageUpload from './components/ImageUpload.vue';
+import DeleteButton from './components/DeleteButton.vue';
 import PageHeader from './components/PageHeader.vue';
 import PageFooter from './components/PageFooter.vue';
-import ImageUpload from './components/ImageUpload.vue';
 
+// User data structure
 const user = ref({
   name: 'Yousif Mahmood',
   email: 'yousifvnd@gmail.com',
   phone: '07732083333',
-  experiences: [{ role: 'Wev Developer', company: 'Mars Team' }],
+  experiences: [{ role: 'Web Developer', company: 'Mars Team' }],
   educations: [{ degree: 'Computer Engineering', institution: 'University of Baghdad' }],
-  skills: ['Vue.js', 'Tailwind CSS', 'Laravel'],
+  projects: [{ title: 'CV Generator', description: 'Free wep app with simpl & straight forward interface to help u craft the best CV for your next interview' }],
   certificates: [{ title: 'CS50x', issuer: 'Harvard University' }],
-  projects: [{ title: 'Weather App', description: 'Dynamic weather app to show real time weather forecasts around the world' }],
+  skills: ['Vue.js', 'Tailwind CSS', 'Laravel', 'MySQL', 'Git'],
   photo: './img/cv-placeholder.jpeg',
 });
 
@@ -63,20 +146,53 @@ const updatePhoto = (newPhoto) => {
   user.value.photo = newPhoto;
 };
 
-const generatePDF = () => {
-  const element = document.getElementById('cv-preview');
+// Form schema
+const formSchema = yup.object({
+  name: yup.string().required('Name is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  phone: yup.string().required('Phone is required'),
+  experiences: yup.array().of(
+    yup.object({
+      role: yup.string().required('Role is required'),
+      company: yup.string().required('Company is required'),
+    })
+  ).min(1, 'At least one experience is required'),
+  educations: yup.array().of(
+    yup.object({
+      degree: yup.string().required('Degree is required'),
+      institution: yup.string().required('Institution is required'),
+    })
+  ).min(1, 'At least one education is required'),
+  projects: yup.array().of(
+    yup.object({
+      title: yup.string().required('Title is required'),
+      description: yup.string().required('Description is required'),
+    })
+  ).min(1, 'At least one project is required'),
+  certificates: yup.array().of(
+    yup.object({
+      title: yup.string().required('Title is required'),
+      issuer: yup.string().required('Issuer is required'),
+    })
+  ).min(1, 'At least one certificate is required'),
+  skills: yup.array().of(
+    yup.string().required('Skill is required')
+  ).min(1, 'At least one skill is required'),
+});
 
-  // Temporarily set preview to 100% for printing
-  customSize.value = 100;
-
-  // Generate the PDF
-  html2pdf().from(element).save().then(() => {
-    // After saving, reset to the user's chosen size
-    customSize.value = originalSize.value;
-  });
+// Generic handlers for adding/removing sections
+const addItem = (section, defaultItem) => {
+  user.value[section].push(defaultItem);
 };
 
-provide('user', user);
+const removeItem = (section, index) => {
+  user.value[section].splice(index, 1);
+};
+
+// Submit form
+const submitForm = () => {
+  console.log('Form submitted', user.value);
+};
 </script>
 
 <style scoped>
